@@ -1,0 +1,116 @@
+:root {
+  --chaux: #f4f5f1;
+  --papier: #ffffff;
+  --encre: #16213a;
+  --encre-2: #4a5472;
+  --bleu: #2447b8;
+  --bleu-fonce: #1a3590;
+  --ciel: #e3eafb;
+  --jasmin: #f0c24b;
+  --trait: #dadde5;
+  --trait-fort: #b9bfce;
+  --ok: #1f7a4d;
+  --ok-bg: #e2f3ea;
+  --moyen: #8f5600;
+  --moyen-bg: #fdf0d6;
+  --ko: #b3261e;
+  --ko-bg: #fbe4e2;
+  --font-ui: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  --font-tutor: 'Literata', Georgia, 'Times New Roman', serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--chaux);
+  color: var(--encre);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, p { margin: 0; }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+
+:focus-visible {
+  outline: 3px solid var(--bleu);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Surface commune aux trois panneaux */
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  background: var(--papier);
+  border: 1px solid var(--trait);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.1rem 0.8rem;
+
+  h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+}
+
+.muted { color: var(--encre-2); font-size: 0.85rem; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--bleu);
+  color: #fff;
+  font-weight: 600;
+  transition: background 0.15s;
+
+  &:hover:not(:disabled) { background: var(--bleu-fonce); }
+  &:disabled { background: var(--trait); color: var(--encre-2); cursor: not-allowed; }
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--bleu);
+  border: 1px solid var(--trait-fort);
+
+  &:hover:not(:disabled) { background: var(--ciel); }
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 1.25rem 1.1rem;
+
+  h3 { font-size: 1.05rem; font-weight: 700; }
+  p { color: var(--encre-2); max-width: 32ch; }
+  .btn { margin-top: 0.4rem; }
+}

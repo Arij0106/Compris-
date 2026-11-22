@@ -1,0 +1,49 @@
+<div class="stream" #stream aria-live="polite">
+  @if (!store.messages().length) {
+    <div class="hello">
+      <h3>Pose ta question, reformule avec tes mots</h3>
+      <p>L’agent répond à partir de tes cours.</p>
+      <ul class="starters">
+        @for (s of starters(); track s) {
+          <li><button type="button" (click)="useStarter(s)">{{ s }}</button></li>
+        }
+      </ul>
+    </div>
+  } @else {
+    <ol class="thread">
+      @for (m of store.messages(); track m.id) {
+        <li class="msg" [class.msg--user]="m.role === 'user'" [class.msg--failed]="m.failed">
+          @if (m.role === 'tutor' && m.type && m.type !== 'in_course') {
+            <span class="tag">{{ m.type === 'out_of_course' ? 'Hors du cours' : 'Hors sujet' }}</span>
+          }
+          <div class="msg__text">{{ m.text }}</div>
+          @if (m.sources?.length) {
+            <ul class="cites" aria-label="Sources dans le cours">
+              @for (c of m.sources; track $index) {
+                <li>p. {{ c.page }} · {{ c.chapitre }}</li>
+              }
+            </ul>
+          }
+        </li>
+      }
+      @if (store.sending()) {
+        <li class="msg msg--typing" aria-label="L’agent écrit"><span></span><span></span><span></span></li>
+      }
+    </ol>
+  }
+</div>
+
+<form class="composer" (submit)="$event.preventDefault(); submit()">
+  <textarea
+    #input
+    rows="1"
+    [value]="draft()"
+    placeholder="Écris ta question ou reformule avec tes mots"
+    aria-label="Question sur le cours"
+    (input)="onInput(input)"
+    (keydown)="onKeydown($event)"
+  ></textarea>
+  <button type="submit" class="send" [disabled]="!canSend()" aria-label="Envoyer">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M12 5l-6 6M12 5l6 6"/></svg>
+  </button>
+</form>

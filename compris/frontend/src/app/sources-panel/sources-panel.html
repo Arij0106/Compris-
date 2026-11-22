@@ -1,0 +1,94 @@
+<section class="panel" aria-labelledby="sources-title">
+  <header class="panel__head">
+    <h2 id="sources-title">Mes cours</h2>
+    @if (store.sources().length) {
+      <span class="muted">{{ store.selectedCount() }} sur {{ store.eligible().length }} utilisés</span>
+    }
+  </header>
+
+  <div class="drop" [class.drop--over]="dragging()" (dragover)="onDragOver($event)" (dragleave)="dragging.set(false)" (drop)="onDrop($event)">
+    <input #picker type="file" multiple hidden [accept]="accept" (change)="onPick(picker)">
+    <button type="button" class="drop__btn" (click)="picker.click()">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 16V4M12 4l-4.5 4.5M12 4l4.5 4.5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>
+      </svg>
+      <span class="drop__title">Ajouter des cours</span>
+      <span class="drop__hint">Glisse tes fichiers ici ou clique pour les choisir</span>
+    </button>
+    <p class="drop__formats">PDF, Word, Excel, PowerPoint, texte</p>
+  </div>
+
+  @if (store.sources().length) {
+    <div class="list-head">
+      <label class="check">
+        <input type="checkbox" [checked]="store.allSelected()" [indeterminate]="store.someSelected()" [disabled]="!store.eligible().length" (change)="store.toggleAll()">
+        <span class="check__box" aria-hidden="true"></span>
+        <span>Tout sélectionner</span>
+      </label>
+    </div>
+
+    <ul class="files">
+      @for (s of store.sources(); track s.id) {
+        <li class="file" [class.file--off]="!s.selected" [class.file--error]="s.status === 'error'">
+          <label class="check">
+            <input type="checkbox" [checked]="s.selected" [disabled]="s.status === 'error'" [attr.aria-label]="'Utiliser ' + s.name" (change)="store.toggle(s.id)">
+            <span class="check__box" aria-hidden="true"></span>
+          </label>
+
+          <span class="badge" [class]="'badge badge--' + s.kind" aria-hidden="true">{{ s.ext }}</span>
+
+          <div class="file__body">
+            <span class="file__name" [title]="s.name">{{ s.name }}</span>
+            @switch (s.status) {
+              @case ('uploading') {
+                <span class="bar" role="progressbar" [attr.aria-valuenow]="s.progress" aria-valuemin="0" aria-valuemax="100" [attr.aria-label]="'Envoi de ' + s.name">
+                  <span [style.width.%]="s.progress"></span>
+                </span>
+              }
+              @case ('error') {
+                <span class="file__meta file__meta--error">{{ s.error }}</span>
+              }
+              @default {
+                <span class="file__meta">{{ size(s.size) }} · prêt</span>
+              }
+            }
+          </div>
+
+          @if (s.status === 'error') {
+            <button type="button" class="icon-btn" [attr.aria-label]="'Réessayer ' + s.name" (click)="store.retry(s.id)">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg>
+            </button>
+          }
+          <button type="button" class="icon-btn" [attr.aria-label]="'Retirer ' + s.name" (click)="store.remove(s.id)">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </li>
+      }
+    </ul>
+
+  } @else {
+    <div class="empty">
+      <h3>Aucun cours pour l’instant</h3>
+      <p>Ajoute un ou plusieurs cours. Quand tout est importé, lance l’analyse.</p>
+    </div>
+  }
+
+  <div class="cta">
+    <button type="button" class="btn cta__btn" [disabled]="!store.canAnalyze()" (click)="analyze()">
+      {{ store.stage() === 'analyzing' ? 'Analyse en cours…' : store.hasAnalysis() ? 'Analyser à nouveau' : 'Analyser les cours' }}
+    </button>
+    <p class="muted cta__hint">
+      @if (store.uploading()) {
+        Envoi en cours, patiente un instant.
+      } @else if (!store.courseIds().length) {
+        Coche au moins un cours pour lancer l’analyse.
+      } @else if (store.selectionChanged()) {
+        La sélection a changé depuis la dernière analyse.
+      } @else if (store.hasAnalysis()) {
+        Le parcours suit l’analyse actuelle.
+      } @else {
+        Appuie ici quand l’import est terminé.
+      }
+    </p>
+  </div>
+</section>

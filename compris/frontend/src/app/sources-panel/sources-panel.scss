@@ -1,0 +1,194 @@
+.drop {
+  margin: 0 1rem;
+  padding: 0.4rem;
+  border: 2px dashed var(--trait-fort);
+  border-radius: 16px;
+  text-align: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.drop--over { background: var(--ciel); border-color: var(--bleu); }
+
+.drop__btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  width: 100%;
+  padding: 1rem 0.5rem 0.6rem;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--bleu);
+
+  &:hover { background: var(--ciel); }
+}
+
+.drop__title { font-weight: 700; font-size: 1rem; color: var(--encre); }
+.drop__hint { font-size: 0.85rem; color: var(--encre-2); }
+.drop__formats { padding: 0 0 0.5rem; font-size: 0.8rem; color: var(--encre-2); }
+
+.list-head {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.1rem 0.4rem;
+  border-bottom: 1px solid var(--trait);
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.files {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 0 0.5rem;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.6rem;
+  border-radius: 12px;
+
+  &:hover { background: var(--chaux); }
+}
+
+.file--off .file__name, .file--off .badge { opacity: 0.5; }
+
+.file__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.file__name {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file__meta { font-size: 0.8rem; color: var(--encre-2); }
+.file__meta--error { color: var(--ko); font-weight: 600; }
+
+.bar {
+  display: block;
+  height: 5px;
+  border-radius: 99px;
+  background: var(--trait);
+  overflow: hidden;
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--bleu);
+    transition: width 0.12s linear;
+  }
+}
+
+.badge {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 10px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: lowercase;
+}
+
+.badge--pdf { background: #fde3dc; color: #a2310f; }
+.badge--word { background: var(--ciel); color: var(--bleu-fonce); }
+.badge--excel { background: var(--ok-bg); color: var(--ok); }
+.badge--ppt { background: var(--moyen-bg); color: var(--moyen); }
+.badge--text { background: var(--chaux); color: var(--encre-2); border: 1px solid var(--trait); }
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--encre-2);
+
+  &:hover { background: var(--trait); color: var(--encre); }
+}
+
+.cta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding: 0.85rem 1rem 1rem;
+  border-top: 1px solid var(--trait);
+}
+
+.cta__btn { width: 100%; padding: 0.8rem 1rem; font-size: 1rem; }
+.cta__hint { text-align: center; }
+
+/* Case à cocher personnalisée */
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0;
+    cursor: pointer;
+  }
+}
+
+.check__box {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--trait-fort);
+  border-radius: 6px;
+  background: var(--papier);
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.check input:checked + .check__box,
+.check input:indeterminate + .check__box {
+  border-color: var(--bleu);
+  background: var(--bleu);
+}
+
+.check input:checked + .check__box::after {
+  content: '';
+  width: 0.3rem;
+  height: 0.6rem;
+  margin-top: -2px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.check input:indeterminate + .check__box::after {
+  content: '';
+  width: 0.6rem;
+  height: 2px;
+  background: #fff;
+}
+
+.check input:focus-visible + .check__box { outline: 3px solid var(--bleu); outline-offset: 2px; }
+.check input:disabled + .check__box { opacity: 0.4; }

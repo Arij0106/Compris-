@@ -1,0 +1,51 @@
+<section class="panel" aria-labelledby="journey-title">
+  <header class="panel__head">
+    <h2 id="journey-title">Unités du cours</h2>
+    @if (store.units().length) {
+      <span class="muted">{{ store.acquiredCount() }} sur {{ store.units().length }} acquises</span>
+    }
+  </header>
+
+  @if (store.units().length) {
+    <div class="progress" aria-hidden="true">
+      <span [style.width.%]="(store.acquiredCount() / store.units().length) * 100"></span>
+    </div>
+
+    <ol class="units">
+      @for (u of store.units(); track u.id; let i = $index) {
+        <li class="unit" [class]="'unit unit--' + u.status" [attr.aria-current]="u.status === 'current' ? 'step' : null"
+            tabindex="0"
+            role="button"
+            [attr.aria-label]="'Ouvrir le quiz de ' + u.title"
+            (click)="store.goToUnit(i)"
+            (keydown.enter)="store.goToUnit(i)"
+            (keydown.space)="store.goToUnit(i)">
+          <span class="unit__mark" aria-hidden="true"></span>
+          <div class="unit__body">
+            <span class="unit__title">{{ u.title }}</span>
+            @if (u.summary) { <span class="unit__sum">{{ u.summary }}</span> }
+          </div>
+          <span class="unit__state">
+            {{ label(u.status) }}@if (u.total) { · {{ u.score }}/{{ u.total }} }
+          </span>
+        </li>
+      }
+    </ol>
+
+    @if (store.gaps().length) {
+      <div class="gaps">
+        <h3>Lacunes repérées</h3>
+        <ul>
+          @for (g of store.gaps(); track $index) {
+            <li><strong>{{ g.concept }}</strong><span class="muted">{{ g.unit }}</span></li>
+          }
+        </ul>
+      </div>
+    }
+  } @else {
+    <div class="empty">
+      <h3>Pas encore d’unités</h3>
+      <p>Après l’analyse, les unités de ton cours apparaissent ici, avec ton avancement.</p>
+    </div>
+  }
+</section>

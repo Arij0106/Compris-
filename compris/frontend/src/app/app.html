@@ -1,0 +1,42 @@
+<div class="app">
+  <header class="top">
+    <div class="brand" aria-label="Compris ?">
+      <span class="brand__word">Compris</span>
+      <span class="brand__mark" aria-hidden="true">?</span>
+    </div>
+
+    <div class="top__right">
+      <span class="mode" [class.mode--live]="!demo" [title]="demo ? 'Les réponses sont simulées dans le navigateur' : apiUrl">
+        <span class="mode__dot" aria-hidden="true"></span>
+        {{ demo ? 'Mode démo, sans serveur' : 'Connecté au serveur' }}
+      </span>
+      <button type="button" class="btn btn--ghost" [disabled]="store.isEmpty()" (click)="reset()">
+        Vider la session
+      </button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <app-sources-panel class="pane" [class.is-active]="view() === 'sources'" />
+    <app-stage-panel class="pane" [class.is-active]="view() === 'stage'" />
+    <app-journey-panel class="pane" [class.is-active]="view() === 'journey'" />
+  </main>
+
+  <nav class="tabbar" aria-label="Sections">
+    @for (v of views; track v.id) {
+      <button type="button" [class.is-on]="view() === v.id" [attr.aria-current]="view() === v.id ? 'page' : null" (click)="view.set(v.id)">
+        {{ v.label }}
+        @if (v.id === 'sources' && store.selectedCount()) {
+          <span class="tabbar__n">{{ store.selectedCount() }}</span>
+        }
+      </button>
+    }
+  </nav>
+
+  @if (store.notice(); as n) {
+    <div class="toast" [class.toast--error]="n.kind === 'error'" role="status">
+      <span>{{ n.text }}</span>
+      <button type="button" aria-label="Fermer le message" (click)="store.dismissNotice()">×</button>
+    </div>
+  }
+</div>

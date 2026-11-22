@@ -1,0 +1,25 @@
+# Lance toute la plateforme :  docker compose up --build
+#   Frontend : http://localhost:4200
+#   API      : http://localhost:8000  (doc interactive : /docs)
+# Prérequis : copier backend/.env.example vers backend/.env et y mettre une clé LLM.
+services:
+  backend:
+    build: ./backend
+    container_name: compris-backend
+    env_file: ./backend/.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/datasets:/app/datasets:ro
+      - ./backend/models:/app/models
+      - ./backend/storage:/app/storage
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: compris-frontend
+    depends_on:
+      - backend
+    ports:
+      - "4200:80"
+    restart: unless-stopped

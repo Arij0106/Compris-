@@ -1,0 +1,182 @@
+<section class="panel" aria-labelledby="stage-title">
+  <header class="panel__head">
+    @if (store.chatOpen()) {
+      <div class="head-left">
+        <button type="button" class="btn btn--ghost btn--sm" (click)="store.closeChat()">← {{ backLabel() }}</button>
+        <h2 id="stage-title">Questions sur le cours</h2>
+      </div>
+      @if (store.stage() === 'result' && store.result()?.acquired) {
+        <button type="button" class="btn btn--sm" (click)="store.nextUnit()">
+          {{ store.hasNextUnit() ? 'Unité suivante' : 'Terminer le parcours' }}
+        </button>
+      }
+    } @else {
+      <h2 id="stage-title">Étude</h2>
+      @if (store.currentUnit(); as u) {
+        <span class="scope">Unité {{ store.unitIndex() + 1 }} sur {{ store.units().length }}</span>
+      }
+    }
+  </header>
+
+  @if (store.chatOpen()) {
+    <app-chat-panel />
+  } @else {
+    <div class="stage">
+      @switch (store.stage()) {
+        @case ('idle') {
+          <div class="hero">
+            <span class="hero__q" aria-hidden="true">?</span>
+            <h1>Qu’est-ce qui reste flou ?</h1>
+            <p>Importe tes cours : l’agent te pose des quiz unité par unité et repère ce qu’il faut revoir.</p>
+            <ol class="steps">
+              @for (s of steps(); track s.label) {
+                <li [class.is-done]="s.done">{{ s.label }}</li>
+              }
+            </ol>
+          </div>
+        }
+
+        @case ('analyzing') {
+          <div class="wait" role="status">
+            <span class="spinner" aria-hidden="true"></span>
+            <h3>L’agent analyse tes cours</h3>
+            <p>Il lit les documents et les découpe en unités. Ça peut prendre un moment.</p>
+            <button type="button" class="btn btn--ghost" (click)="store.cancelAnalysis()">Annuler</button>
+          </div>
+        }
+
+        @case ('quizLoading') {
+          <div class="wait" role="status">
+            <span class="spinner" aria-hidden="true"></span>
+            <h3>Préparation du quiz</h3>
+            <p>{{ store.currentUnit()?.title }}</p>
+          </div>
+        }
+
+        @case ('quiz') {
+          @if (store.quiz(); as q) {
+            <div class="quiz">
+              <div class="quiz__unit">{{ store.currentUnit()?.title }}</div>
+              <div class="quiz__top">
+                <span class="muted">Question {{ q.index + 1 }} sur {{ q.questions.length }}</span>
+                <span class="chip">{{ q.questions[q.index].concept }} · {{ q.questions[q.index].level }}</span>
+              </div>
+              <span class="bar" aria-hidden="true"><span [style.width.%]="quizProgress()"></span></span>
+              <h3 class="quiz__q">{{ q.questions[q.index].question }}</h3>
+
+              <ul class="choices" role="radiogroup" [attr.aria-label]="q.questions[q.index].question">
+                @for (c of q.questions[q.index].choices; track $index) {
+                  <li>
+                    <button type="button" role="radio" [attr.aria-checked]="q.answers[q.index] === $index" [class.is-picked]="q.answers[q.index] === $index" (click)="store.pick($index)">
+                      {{ c }}
+                    </button>
+                  </li>
+                }
+              </ul>
+
+              <div class="nav">
+                <button type="button" class="btn btn--ghost" [disabled]="q.index === 0" (click)="store.prevQuestion()">Précédente</button>
+                @if (q.index < q.questions.length - 1) {
+                  <button type="button" class="btn" [disabled]="q.answers[q.index] === null" (click)="store.nextQuestion()">Suivante</button>
+                } @else {
+                  <button type="button" class="btn" [disabled]="!store.allAnswered()" (click)="store.submitQuiz()">Envoyer mes réponses</button>
+                }
+              </div>
+              @if (q.index === q.questions.length - 1 && !store.allAnswered()) {
+                <p class="muted">Réponds à toutes les questions pour envoyer le quiz.</p>
+              }
+            </div>
+          }
+        }
+
+        @case ('evaluating') {
+          <div class="wait" role="status">
+            <span class="spinner" aria-hidden="true"></span>
+            <h3>L’agent analyse tes réponses</h3>
+            <p>Il cherche les notions qui ne sont pas encore solides.</p>
+          </div>
+        }
+
+        @case ('result') {
+          @if (store.result(); as r) {
+            <div class="result" [class.result--ok]="r.acquired">
+              <p class="result__score">{{ r.score }} / {{ r.total }}</p>
+              <h3>{{ r.acquired ? 'Unité acquise' : 'Des lacunes à combler' }}</h3>
+
+              @if (r.acquired) {
+                <p class="lead">Tu maîtrises cette unité. Que veux-tu faire maintenant ?</p>
+                @if (r.synthesis) {
+                  <div class="synthesis-card">
+                    <div class="synthesis-card__head">
+                      <span class="synthesis-card__icon" aria-hidden="true">📖</span>
+                      <h4>Synthèse du chapitre</h4>
+                    </div>
+                    <div class="synthesis-card__content">{{ r.synthesis }}</div>
+                  </div>
+                }
+              } @else {
+                <p class="lead">Voici ce qui n’est pas encore solide :</p>
+                <ul class="gaps">
+                  @for (g of r.gaps; track g.concept) {
+                    <li><strong>{{ g.concept }}</strong><span>{{ g.explanation }}</span></li>
+                  }
+                </ul>
+              }
+
+              <div class="actions">
+                @if (r.acquired) {
+                  <button type="button" class="btn" (click)="store.nextUnit()">
+                    {{ store.hasNextUnit() ? 'Passer à l’unité suivante' : 'Terminer le parcours' }}
+                  </button>
+                  <button type="button" class="btn btn--ghost" (click)="store.openChat()">Poser des questions ou reformuler</button>
+                } @else {
+                  <button type="button" class="btn" (click)="store.openChat()">Poser des questions sur ces lacunes</button>
+                  <button type="button" class="btn btn--ghost" (click)="store.retryUnit()">Refaire le quiz de l’unité</button>
+                }
+              </div>
+
+              @if (store.quiz(); as q) {
+                <details class="correction">
+                  <summary>Voir l’analyse des réponses & indices</summary>
+                  <ol>
+                    @for (question of q.questions; track question.id) {
+                      @if (feedbackFor(question.id); as f) {
+                        <li [class.is-ok]="f.correct">
+                          <span class="correction__state">{{ f.correct ? '✓ Juste' : '💡 Indice pour réfléchir' }}</span>
+                          <span class="correction__q">{{ question.question }}</span>
+                          <span class="muted correction__hint">{{ f.explanation }}</span>
+                        </li>
+                      }
+                    }
+                  </ol>
+                </details>
+              }
+            </div>
+          }
+        }
+
+        @case ('finished') {
+          <div class="result result--ok">
+            <p class="result__score">{{ store.acquiredCount() }} / {{ store.units().length }}</p>
+            <h3>Parcours terminé</h3>
+            <p class="lead">
+              {{ store.acquiredCount() === store.units().length ? 'Toutes les unités sont acquises.' : 'Certaines unités ont encore des lacunes, tu peux les reprendre.' }}
+            </p>
+            <div class="actions">
+              <button type="button" class="btn" (click)="store.openChat()">Poser des questions sur le cours</button>
+              <button type="button" class="btn btn--ghost" (click)="store.restartJourney()">Recommencer le parcours</button>
+            </div>
+          </div>
+        }
+
+        @case ('error') {
+          <div class="wait wait--error" role="alert">
+            <h3>Ça n’a pas marché</h3>
+            <p>{{ store.stageError() }}</p>
+            <button type="button" class="btn" (click)="store.retryStage()">Réessayer</button>
+          </div>
+        }
+      }
+    </div>
+  }
+</section>

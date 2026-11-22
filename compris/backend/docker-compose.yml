@@ -1,0 +1,29 @@
+services:
+  backend:
+    build: .
+    container_name: tutor-backend
+    ports:
+      - "8000:8000"
+    env_file: .env
+    volumes:
+      - ./datasets:/app/datasets:ro   # vos datasets (lecture seule)
+      - ./models:/app/models          # modèles ML entraînés + metrics.json
+      - ./storage:/app/storage        # base SQLite + cours uploadés
+    restart: unless-stopped
+
+  # Optionnel : PostgreSQL. Lancer avec :  docker compose --profile postgres up --build
+  # (et mettre DATABASE_URL=postgresql+psycopg2://tutor:tutor@postgres:5432/tutor dans .env)
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["postgres"]
+    environment:
+      POSTGRES_USER: tutor
+      POSTGRES_PASSWORD: tutor
+      POSTGRES_DB: tutor
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  pgdata:

@@ -1,0 +1,81 @@
+.progress {
+  height: 6px;
+  margin: 0 1.1rem 0.6rem;
+  border-radius: 99px;
+  background: var(--trait);
+  overflow: hidden;
+
+  span { display: block; height: 100%; background: var(--ok); transition: width 0.3s; }
+}
+
+.units {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0 0.5rem;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.unit {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 0.7rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+  user-select: none;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--bleu);
+    outline-offset: 1px;
+  }
+}
+
+.unit--current { background: var(--ciel); }
+.unit--current:hover { background: var(--ciel); }
+
+.unit__mark {
+  flex: none;
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 2px solid var(--trait-fort);
+  border-radius: 50%;
+}
+
+.unit--current .unit__mark { border-color: var(--bleu); background: var(--bleu); }
+.unit--acquired .unit__mark { border-color: var(--ok); background: var(--ok); }
+.unit--gaps .unit__mark { border-color: var(--moyen); background: var(--moyen); }
+
+.unit__body { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.unit__title { font-weight: 600; overflow-wrap: anywhere; }
+.unit__sum { font-size: 0.8rem; color: var(--encre-2); }
+.unit__state { flex: none; font-size: 0.8rem; font-weight: 700; color: var(--encre-2); }
+.unit--acquired .unit__state { color: var(--ok); }
+.unit--gaps .unit__state { color: var(--moyen); }
+.unit--current .unit__state { color: var(--bleu-fonce); }
+
+.gaps {
+  margin: 1rem 1rem 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--trait);
+
+  h3 { margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 700; }
+
+  ul { display: flex; flex-direction: column; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+
+  li {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 0.7rem;
+    border-left: 4px solid var(--moyen);
+    border-radius: 4px 10px 10px 4px;
+    background: var(--moyen-bg);
+  }
+}
